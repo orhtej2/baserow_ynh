@@ -8,6 +8,8 @@ name = "Baserow"
 description.en = "No-code database and Airtable alternative. "
 description.fr = "Sans-code database and Airtable alternative. "
 
+maintainers = []
+
 version = "1.24.2~ynh1"
 
 [upstream]
@@ -19,11 +21,10 @@ code = "https://gitlab.com/baserow/baserow"
 
 [integration]
 yunohost = '>= 11.2'
-architectures = "all" # TODO : handle the "all" option (no ["all"])
+architectures = "all"
 multi_instance = true
-ldap = "false" # TODO : fixme, use actual booleans + handle the "not_relevant" value
-sso = "false"
-# FIXME: replace with an **estimate** minimum disk and RAM requirements. e.g. 20M, 400M, 1G... You may have have a look at CI results
+ldap = false
+sso = false
 disk = "50M"
 ram.build = "50M"
 ram.runtime = "50M"
@@ -46,16 +47,8 @@ ram.runtime = "50M"
     [resources.sources]
 
         [resources.sources.main]
-        # This will pre-fetch the asset which can then be deployed during the install/upgrade scripts with :
-        #    ynh_setup_source --dest_dir="$install_dir"
-        # You can also define other assets than "main" and add --source_id="foobar" in the previous command
         url = "https://gitlab.com/baserow/baserow/-/archive/1.24.2/baserow-1.24.2.tar.gz"
         sha256 = "3646313878eb19b6df6ceb293f52674beb41647c18b649c98f5d39cca1799872"
-
-        # These infos are used by https://github.com/YunoHost/apps/blob/master/tools/autoupdate_app_sources/autoupdate_app_sources.py
-        # to auto-update the previous asset urls and sha256sum + manifest version
-        # assuming the upstream's code repo is on github and relies on tags or releases
-        # See the 'sources' resource documentation for more details
 
     [resources.system_user]
 
@@ -67,6 +60,9 @@ ram.runtime = "50M"
     main.url = "/"
 
     [resources.ports]
+    
     [resources.apt]
-    packages = "build-essential lsb-release ca-certificates curl gnupg2 libpq-dev gettext procps python3 python3-dev gosu xmlsec1  postgresql "[resources.database]
+    packages = "build-essential lsb-release ca-certificates curl gnupg2 libpq-dev gettext procps python3 python3-dev gosu xmlsec1 postgresql"
+    
+    [resources.database]
     type = "postgresql"
