@@ -64,17 +64,33 @@ chown $app:$app "$install_dir/"
 #=================================================
 # INSTALL APP
 #=================================================
-ynh_script_progression --message="Installing app..." --weight=5
+ynh_script_progression --message="Building frontend..." --weight=5
 
 pushd $install_dir/build/web-frontend
-ynh_exec_as $app $ynh_node_load_PATH yarn install
-ynh_exec_as $app $ynh_node_load_PATH yarn cache clean
-ynh_exec_as $app $ynh_node_load_PATH yarn run build-local 
-ynh_secure_remove --file="$install_dir/build/web-frontend/node_modules"
-ynh_exec_as $app $ynh_node_load_PATH yarn install --production
-ynh_exec_as $app $ynh_node_load_PATH yarn cache clean
-
+    ynh_exec_as $app $ynh_node_load_PATH yarn install
+    ynh_exec_as $app $ynh_node_load_PATH yarn cache clean
+    ynh_exec_as $app env $ynh_node_load_PATH NUXT_TELEMETRY_DISABLED=1 yarn run build-local 
+    ynh_secure_remove --file="$install_dir/build/web-frontend/node_modules"
+    ynh_exec_as $app $ynh_node_load_PATH yarn install --production
+    ynh_exec_as $app $ynh_node_load_PATH yarn cache clean
 popd
+
+mv $install_dir/build/web-frontend $install_dir
+mv $install_dir/build/deploy/plugins $install_dir
+ynh_replace_string --match_string="source /baserow" --replace_string="source $install_dir" --target_file="$install_dir/web-frontend/docker/docker-entrypoint.sh"
+
+ynh_script_progression --message="Building backend..." --weight=5
+
+ynh_exec_as $app python3 -m venv $install_dir/backend
+source $install_dir/backend/bin/activate
+
+mv $install_dir/build/backend $install_dir/backend/src
+pip install -r $install_dir/backend/src/requirements/base.txt
+
+ynh_replace_string --match_string="source /baserow" --replace_string="source $install_dir" --target_file="$install_dir/backend/src/backend/docker/docker-entrypoint.sh"
+
+deactivate
+
 
 #=================================================
 # START SYSTEMD SERVICE
