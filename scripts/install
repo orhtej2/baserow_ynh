@@ -58,7 +58,7 @@ ynh_script_progression --message="Adding app's configuration file..."
 # FIXME: this should be handled by the core in the future
 # You may need to use chmod 600 instead of 400,
 # for example if the app is expected to be able to modify its own config
-chmod 400 "$install_dir/"
+chmod 700 "$install_dir/"
 chown $app:$app "$install_dir/"
 
 #=================================================
